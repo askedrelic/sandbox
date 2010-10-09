@@ -1,0 +1,3 @@
+#python
+-celery distributed task queue
+-pygooglevoice google voice through python http://code.google.com/p/pygooglevoice/source/browse/
