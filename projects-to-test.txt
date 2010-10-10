@@ -1,3 +1,7 @@
 #python
 -celery distributed task queue
 -pygooglevoice google voice through python http://code.google.com/p/pygooglevoice/source/browse/
+-fulltext python search http://bitbucket.org/mchaput/whoosh/wiki/Home
+
+#ruby
+-http lib? http://htty.github.com/
