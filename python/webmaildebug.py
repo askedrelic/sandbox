@@ -83,13 +83,19 @@ class HTTPServer(asyncore.dispatcher):
             channel.push("\r\n")
             channel.push("MESSAGES RESET")
             self.store.clear_all()
-        elif re.match('^/view/\d+/$',path):
-            #view an invididual message
-            id = re.match('^/view/(\d+)/$',path).group(1)
+        elif re.match('^/view/\d+/$|^/view/\d+/html/$',path):
+            #view an invididual message, as text or html
+            id = re.match('^/view/(\d+)/.*$',path).group(1)
+            html = False
+            if re.match('^/view/\d+/html/$',path):
+                html = True
             data = self.store.fetch_index(id)
             if data:
                 channel.pushstatus(200, "OK")
-                channel.push("Content-type: text/plain\r\n")
+                if html:
+                    channel.push("Content-Type: text/html; charset=utf-8\r\n")
+                else:
+                    channel.push("Content-Type: text/plain\r\n")
                 channel.push("\r\n")
                 message = email.message_from_string(str(data))
                 channel.push(str(message))
