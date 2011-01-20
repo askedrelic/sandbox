@@ -5,3 +5,6 @@
 
 #ruby
 -http lib? http://htty.github.com/
+
+#algorithms
+Knuth-Morris-Pratt Algorithm http://www.ics.uci.edu/~eppstein/161/960227.html
