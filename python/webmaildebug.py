@@ -169,8 +169,8 @@ class ListStore(DataStore):
         self.counter += 1
 
 if __name__ == '__main__':
-    store = SqlStore()
-    #store = ListStore()
-    MailServer(store,('',1025),None)
-    HTTPServer(store=store,sock=('',5201))
+    #store = SqlStore()
+    store = ListStore()
+    MailServer(store,('',25),None)
+    HTTPServer(store=store,sock=('',5000))
     asyncore.loop()
