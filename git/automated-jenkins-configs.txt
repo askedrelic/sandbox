@@ -1,0 +1,79 @@
+https://gist.github.com/1919354
+
+.gitignore
+---------------
+#
+# The following ignores...
+# Miscellaneous Jenkins litter
+*.log
+*.tmp
+*.old
+*.bak
+*.jar
+*.json
+
+# Generated Jenkins state
+/.owner
+/secret.key
+/queue.xml
+/fingerprints/
+/shelvedProjects/
+/updates/
+
+# Tools that Jenkins manages
+/tools/
+
+# Extracted plugins
+plugins/
+
+# monitoring plugin files
+monitoring/
+
+# Job state
+builds/
+workspace/
+lastStable
+lastSuccessful
+nextBuildNumber
+modules/
+
+
+Jenkins2Github
+---------------
+# Storing jenkins Configs in Github
+
+* create a .gitignore file in your $JENKINS_HOME with the following
+** this may need tuning to your liking 
+** ie storing artifacts etc
+* setup some ENV variables for the user that jenkins runs under.
+** I add the following to /home/jenkins/.bashrc
+** and restart jenkins
+
+    export GIT_AUTHOR_NAME="Sir jenkins"
+    export GIT_AUTHOR_EMAIL="sj@example.com"
+    export GIT_COMMITTER_NAME="Sir Jenkins"
+    export GIT_COMMITTER_EMAIL="sj@example.com"
+
+* create a new Jenkins periodic job with this bash script.
+
+
+
+JenkinsBashJob
+---------------
+#!/bin/bash
+
+# Jenkins Configuraitons Directory
+cd $JENKINS_HOME
+
+# Add any new files
+git add .
+
+# mark as deleted anything that's been, well, deleted
+to_remove=`git status | grep "deleted" | awk '{print $3}'`
+#
+if [ -n "$to_remove" ]; then
+    git rm --ignore-unmatch $to_remove
+fi
+
+git commit -am "Automated Jenkins commit"
+git push -q origin master
