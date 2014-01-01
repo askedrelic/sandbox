@@ -1,0 +1,6 @@
+[submodule "go/so-samp"]
+	path = go/so-samp
+	url = https://github.com/gmallard/go-samp
+[submodule "go/go-samp"]
+	path = go/go-samp
+	url = https://github.com/gmallard/go-samp
