@@ -4,8 +4,10 @@ from string import digits
 def number(s, start):
     token = ''
     for i, c in enumerate(s[start:]):
-        if c not in digits: break
-        else: token += c
+        if c not in digits:
+            break
+        else:
+            token += c
     return int(token), start + i
 
 def string(s, start):
@@ -13,20 +15,28 @@ def string(s, start):
     start += 1
     for i, c in enumerate(s[start:]):
         previous = s[start + i - 1]
-        if previous == '\\': token += c
-        elif c == '\\': continue
-        elif c == '"': break
-        else: token += c
+        if previous == '\\':
+            token += c
+        elif c == '\\':
+            continue
+        elif c == '"':
+            break
+        else:
+            token += c
     return token + '"', start + i
 
 def symbol(s, start):
     token = ''
     for i, c in enumerate(s[start:]):
         previous = s[start + i - 1]
-        if previous == '\\': token += c
-        elif c == '\\': continue
-        elif c == '.': break
-        else: token += c
+        if previous == '\\':
+            token += c
+        elif c == '\\':
+            continue
+        elif c == '.':
+            break
+        else:
+            token += c
     return token, start + i
 
 def parse(s):
