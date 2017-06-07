@@ -1,0 +1,26 @@
+
+set t to lookup in "bugID" given custom data entry:(thisID as string)
+if exists t then
+	set duration of t to thisEstimate
+	set completed of t to thisWork
+else
+	set t to make new task with properties {name:thisTitle, duration:thisEstimate, completed:thisWork} at end of tasks of g
+	set custom data of t to {|bugID|:thisID}
+end if
+
+delete assignments of t
+
+try
+	if thisOwner is missing value or thisOwner is {} or (class of thisOwner) is application then
+		thisOwner = "Unassigned"
+	end if
+	set thisOwner to thisOwner as string
+on error
+	thisOwner = "Unassigned"
+end try
+
+if not (exists resource thisOwner) then
+	make new resource with properties {name:thisOwner}
+end if
+
+assign resource thisOwner to t

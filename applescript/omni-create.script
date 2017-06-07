@@ -1,0 +1,22 @@
+set CTime to (current date)
+tell application "OmniPlan"
+tell first document
+set newTask to make new task with properties {name:"sillyTask"}
+tell newTask
+set camTask to make new task with properties {name:"Camera", starting date:CTime, duration:36000}
+set bagTask to make new task with properties {name:"Bag", starting date:CTime, duration:36000}
+
+--Declare your resource (person)
+set personJamie to resources whose name is "Jamie"
+set personSam to resource whose name is "Sam"
+
+-- Assign the task to the resource
+assign camTask to personJamie
+assign bagTask to personSam
+
+-- Set up your dependency
+depend bagTask upon camTask
+
+end tell
+end tell
+end tell

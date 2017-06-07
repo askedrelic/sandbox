@@ -1,0 +1,48 @@
+#### get schedule for a resource
+
+on isWorkingDay(_date, _resource)
+	tell application "OmniPlan"
+		tell _resource
+			
+			-- Check that the _date is not a calendar exception (such as a holiday)
+			if duration of (calendar day schedules of schedule of _resource where specific date is _date) is 0 then
+				-- this seems to be the point of failure! It always returns {} rather than hours as docs lead me to expect
+				return false
+				
+				-- Also check and see if the day of the week is a normal working day
+			else if duration of item (weekday of _date as integer) of week day schedules of schedule of _resource is 0 then
+				return false
+				
+				-- Otherwise, it is a working day
+			else
+				return true
+			end if
+			
+		end tell
+	end tell
+end isWorkingDay
+
+tell application "OmniPlan"
+	set _projectDays to {}
+	set _projectAvailableDays to 0
+	set _projectStartDate to starting date of front document
+	
+	-- Six week project length
+	repeat with n from 0 to (7 * 6)
+		copy (_projectStartDate + n * days) to end of |_projectDays|
+	end repeat
+	
+	-- Count available days for each resource
+	repeat with r in resources of front document
+		if resource type of r is person then
+			repeat with d in _projectDays
+				if my isWorkingDay(d, r) then
+					set _projectAvailableDays to _projectAvailableDays + 1
+				end if
+			end repeat
+		end if
+	end repeat
+end tell
+
+return _projectAvailableDays
+

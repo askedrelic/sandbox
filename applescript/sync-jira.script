@@ -1,0 +1,95 @@
+set login to "mylogin"
+set passwd to "mypass"
+set jiraProject to "PROJ"
+set jiraReporter to "a_usrname"
+
+on jiraUserForTask(_task)
+	using terms from application "OmniPlan"
+		set assignee to resource of item 1 of assignments of _task
+		if assignee is not equal to missing value then
+			set entries to custom data entries of assignee
+			repeat with i from 1 to count of entries
+				set entry to item i of entries
+				set v to value of entry
+				if name of entry is equal to "jira-user" and v is not missing value then
+					return v
+				end if
+			end repeat
+		end if
+		return missing value
+	end using terms from
+end jiraUserForTask
+
+
+on syncTaskToJira(_task, entry)
+	using terms from application "OmniPlan"
+		set entryKey to value of entry
+		tell application "http://jira.mynetwork.com:8080/rpc/xmlrpc"
+			--if assignee of issue does not equal to _task 
+			set assignee to my jiraUserForTask(_task)
+			if assignee is not equal to missing value then
+				set t to call xmlrpc {method name:"jira1.login", parameters:{my login, my passwd}}
+				
+				if entryKey is equal to "C" then -- create
+					set issue to call xmlrpc {method name:"jira1.createIssue", parameters:{t, {project:my jiraProject, summary:name of _task, type:"3", assignee:assignee, reporter:my jiraReporter}}}
+					
+					tell application "OmniPlan"
+						set value of entry to |key| of issue
+						set entryKey to value of entry
+					end tell
+				else
+					set issue to call xmlrpc {method name:"jira1.getIssue", parameters:{t, entryKey}}
+				end if
+				
+				-- Update the effort (timetracking in Jira)
+				tell application "OmniPlan"
+					set _effort to ((effort of _task) / (60 * 60)) as integer
+					if _effort < 8 then
+						set _effort to "" & _effort & "h"
+					else
+						set _effort to "" & ((_effort / 8) as integer) & "d"
+					end if
+				end tell
+				
+				-- Reset effort + assignee 
+				set issue to call xmlrpc {method name:"jira1.updateIssue", parameters:{t, entryKey, {timetracking:{_effort}}}}
+				set issue to call xmlrpc {method name:"jira1.updateIssue", parameters:{t, entryKey, {assignee:{assignee}}}}
+				
+			end if
+		end tell
+	end using terms from
+end syncTaskToJira
+
+on handleTask(_task)
+	using terms from application "OmniPlan"
+		--tell task _task
+		set entries to custom data entries of _task
+		repeat with i from 1 to count of entries
+			set entry to item i of entries
+			set v to value of entry
+			if name of entry is equal to "jira-id" and v is not missing value then
+				my syncTaskToJira(_task, entry)
+			end if
+		end repeat
+		
+		set subs to child tasks of _task
+		if subs is not missing value then
+			repeat with i from 1 to the count of subs
+				my handleTask(item i of subs)
+			end repeat
+		end if
+	end using terms from
+end handleTask
+
+tell application "OmniPlan"
+	set _window to front window
+	
+	set _document to document of _window
+	set _project to project of my _document
+	set _tasks to tasks of _project
+	set selTasks to selected tasks of front window
+	
+	repeat with i from 1 to the count of selTasks
+		my handleTask(item i of selTasks)
+	end repeat
+end tell
