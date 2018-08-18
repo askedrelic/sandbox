@@ -1,0 +1,4 @@
+https://macscripter.net/viewtopic.php?id=24737
+
+script interface
+https://github.com/liyanage/omniplan-python/blob/master/omniplan.py
